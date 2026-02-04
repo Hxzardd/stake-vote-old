@@ -41,7 +41,14 @@ export default function Home() {
   }
 
   const totalVotes = voting.yesVotes + voting.noVotes
-  const yesPercentage = totalVotes > 0 ? (voting.yesVotes / totalVotes) * 100 : 0
+  const yesPercentage =
+    totalVotes > 0 ? (voting.yesVotes / totalVotes) * 100 : 0
+  const noPercentage =
+    totalVotes > 0 ? (voting.noVotes / totalVotes) * 100 : 0
+  const participation =
+    voting.totalVotingPower > 0
+      ? (totalVotes / voting.totalVotingPower) * 100
+      : 0
 
   return (
     <main className="min-h-screen bg-background">
@@ -70,6 +77,8 @@ export default function Home() {
             yesVotes={voting.yesVotes}
             noVotes={voting.noVotes}
             yesPercentage={yesPercentage}
+            noPercentage={noPercentage}
+            participation={participation}
           />
         </div>
 

@@ -9,6 +9,7 @@ interface UseVotingState {
   noVotes: number
   userStake: number
   hasVoted: boolean
+  totalVotingPower: number
   isLoading: boolean
   isSubmitting: boolean
   error: string | null
@@ -22,6 +23,7 @@ export function useVoting(signer: any, address: string | null) {
     noVotes: 0,
     userStake: 0,
     hasVoted: false,
+    totalVotingPower: 0,
     isLoading: false,
     isSubmitting: false,
     error: null,
@@ -37,6 +39,7 @@ export function useVoting(signer: any, address: string | null) {
         noVotes: 0,
         userStake: 0,
         hasVoted: false,
+        totalVotingPower: 0,
         isLoading: false,
         isSubmitting: false,
         error: null,
@@ -56,6 +59,7 @@ export function useVoting(signer: any, address: string | null) {
           noVotes: Number(data.noVotes),
           userStake: Number(data.userStake),
           hasVoted: data.hasVoted,
+          totalVotingPower: Number(data.totalVotingPower),
           isLoading: false,
         }))
       } catch (err) {
@@ -134,6 +138,7 @@ export function useVoting(signer: any, address: string | null) {
         noVotes: Number(data.noVotes),
         userStake: Number(data.userStake),
         hasVoted: data.hasVoted,
+        totalVotingPower: Number(data.totalVotingPower),
         isLoading: false,
       }))
     } catch (err) {

@@ -1,0 +1,9 @@
+[profile.default]
+src = "contracts"
+test = "test"
+out = "out"
+libs = ["lib"]
+solc = "0.8.28"
+
+[profile.default.fmt]
+line_length = 100
