@@ -1,6 +1,8 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
+import { getStakeVotingContract } from "../src/lib/ethers";
+import { useEffect, useState } from "react";
+
 import Header from '@/components/header'
 import ProposalSection from '@/components/proposal-section'
 import VotingPanel from '@/components/voting-panel'
@@ -49,6 +51,23 @@ export default function Home() {
     voting.totalVotingPower > 0
       ? (totalVotes / voting.totalVotingPower) * 100
       : 0
+  const [yesVotes, setYesVotes] = useState("loading...");
+
+useEffect(() => {
+  async function loadVotes() {
+    try {
+      const contract = await getStakeVotingContract();
+      const votes = await contract.yesVotes();
+      setYesVotes(votes.toString());
+    } catch (e) {
+      console.error(e);
+      setYesVotes("error");
+    }
+  }
+
+  loadVotes();
+}, []);
+
 
   return (
     <main className="min-h-screen bg-background">
