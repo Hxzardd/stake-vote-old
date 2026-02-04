@@ -1,7 +1,7 @@
 import { BrowserProvider, Contract, ContractTransactionResponse } from 'ethers'
 
 // TODO: Replace with your actual contract address after deployment
-export const CONTRACT_ADDRESS = '0x...'
+export const CONTRACT_ADDRESS = '0xd8b934580fcE35a11B58C6D73aDeE468a2833fa8'
 
 /**
  * ABI for StakeVoting contract. Matches exact function signatures required by frontend.
