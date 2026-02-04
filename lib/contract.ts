@@ -8,16 +8,14 @@ export const CONTRACT_ADDRESS = '0x...'
  * Full ABI JSON: contracts/abi/StakeVoting.json
  */
 export const CONTRACT_ABI = [
-  'function getProposal() view returns (string description)',
-  'function getVoteCounts() view returns (uint256 yesVotes, uint256 noVotes)',
-  'function getUserVotingPower(address voter) view returns (uint256 votingPower)',
-  'function hasUserVoted(address voter) view returns (bool)',
+  'function proposalTitle() view returns (string)',
+  'function proposalDescription() view returns (string)',
+  'function yesVotes() view returns (uint256)',
+  'function noVotes() view returns (uint256)',
+  'function totalVotes() view returns (uint256)',
+  'function hasVoted(address) view returns (bool)',
+  'function stakeToken() view returns (address)',
   'function vote(bool support)',
-  // Recommended (optional for UI)
-  'function getProposalDeadline() view returns (uint256 blockTimestamp)',
-  'function getQuorumPercentage() view returns (uint256)',
-  'function getTotalVotingPower() view returns (uint256)',
-  'function getProposalStatus() view returns (string)',
 ]
 
 export interface VotingData {
@@ -42,17 +40,34 @@ export async function fetchVotingData(
 ): Promise<VotingData> {
   const contract = await getVotingContract(signer)
 
-  const [proposal, [yesVotes, noVotes], userStake, hasVoted, totalVotingPower] =
-    await Promise.all([
-      contract.getProposal(),
-      contract.getVoteCounts(),
-      contract.getUserVotingPower(userAddress),
-      contract.hasUserVoted(userAddress),
-      contract.getTotalVotingPower(),
-    ])
+  const [
+    title,
+    description,
+    yesVotes,
+    noVotes,
+    totalVotingPower,
+    hasVoted,
+    stakeTokenAddress,
+  ] = await Promise.all([
+    contract.proposalTitle(),
+    contract.proposalDescription(),
+    contract.yesVotes(),
+    contract.noVotes(),
+    contract.totalVotes(),
+    contract.hasVoted(userAddress),
+    contract.stakeToken(),
+  ])
+
+  const stakeToken = new Contract(
+    stakeTokenAddress,
+    ['function balanceOf(address) view returns (uint256)'],
+    signer,
+  )
+
+  const userStake = await stakeToken.balanceOf(userAddress)
 
   return {
-    proposal,
+    proposal: `${title} — ${description}`,
     yesVotes,
     noVotes,
     userStake,
@@ -60,6 +75,7 @@ export async function fetchVotingData(
     totalVotingPower,
   }
 }
+
 
 export async function submitVote(
   signer: any,
