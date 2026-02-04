@@ -7,6 +7,7 @@ import {
   getProvider,
   getSigner,
   getConnectedAddress,
+  revokeWalletPermissions,
   setupMetaMaskListener,
 } from '@/lib/web3'
 
@@ -27,7 +28,6 @@ export function useWeb3() {
     error: null,
   })
 
-  // Check if wallet is already connected on mount
   useEffect(() => {
     const checkConnection = async () => {
       try {
@@ -50,21 +50,24 @@ export function useWeb3() {
 
     checkConnection()
 
-    // Setup listener for account changes
-    const cleanup = setupMetaMaskListener((accounts) => {
-      if (accounts.length === 0) {
-        setState({
-          address: null,
-          signer: null,
-          provider: null,
-          isConnecting: false,
-          error: null,
-        })
-      } else {
-        // Account changed, we should refetch data
+    const cleanup = setupMetaMaskListener(
+      (accounts) => {
+        if (accounts.length === 0) {
+          setState({
+            address: null,
+            signer: null,
+            provider: null,
+            isConnecting: false,
+            error: null,
+          })
+        } else {
+          checkConnection()
+        }
+      },
+      () => {
         checkConnection()
       }
-    })
+    )
 
     return cleanup
   }, [])
@@ -95,7 +98,7 @@ export function useWeb3() {
     }
   }
 
-  const disconnect = () => {
+  const disconnect = async () => {
     setState({
       address: null,
       signer: null,
@@ -103,6 +106,7 @@ export function useWeb3() {
       isConnecting: false,
       error: null,
     })
+    await revokeWalletPermissions()
   }
 
   return {

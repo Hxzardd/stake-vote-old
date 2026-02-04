@@ -3,21 +3,18 @@ import { BrowserProvider, Contract, ContractTransactionResponse } from 'ethers'
 // TODO: Replace with your actual contract address after deployment
 export const CONTRACT_ADDRESS = '0x...'
 
-/**
- * ABI for StakeVoting contract. Matches exact function signatures required by frontend.
- * Full ABI JSON: contracts/abi/StakeVoting.json
- */
+export function isContractConfigured(): boolean {
+  return Boolean(CONTRACT_ADDRESS && CONTRACT_ADDRESS !== '0x...')
+}
+
 export const CONTRACT_ABI = [
-  'function getProposal() view returns (string description)',
-  'function getVoteCounts() view returns (uint256 yesVotes, uint256 noVotes)',
-  'function getUserVotingPower(address voter) view returns (uint256 votingPower)',
-  'function hasUserVoted(address voter) view returns (bool)',
+  'function proposalDescription() view returns (string)',
+  'function getVoteCounts() view returns (uint256, uint256)',
+  'function getUserVotingPower(address) view returns (uint256)',
+  'function hasVoted(address) view returns (bool)',
+  'function totalVotingPower() view returns (uint256)',
+  'function getPhase() view returns (uint8)',
   'function vote(bool support)',
-  // Recommended (optional for UI)
-  'function getProposalDeadline() view returns (uint256 blockTimestamp)',
-  'function getQuorumPercentage() view returns (uint256)',
-  'function getTotalVotingPower() view returns (uint256)',
-  'function getProposalStatus() view returns (string)',
 ]
 
 export interface VotingData {
@@ -36,19 +33,31 @@ export async function getVotingContract(signer: any) {
   return new Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer)
 }
 
+const EMPTY_VOTING_DATA: VotingData = {
+  proposal: '',
+  yesVotes: 0n,
+  noVotes: 0n,
+  userStake: 0n,
+  hasVoted: false,
+  totalVotingPower: 0n,
+}
+
 export async function fetchVotingData(
   signer: any,
   userAddress: string,
 ): Promise<VotingData> {
+  if (!isContractConfigured()) {
+    return EMPTY_VOTING_DATA
+  }
   const contract = await getVotingContract(signer)
 
   const [proposal, [yesVotes, noVotes], userStake, hasVoted, totalVotingPower] =
     await Promise.all([
-      contract.getProposal(),
+      contract.proposalDescription(),
       contract.getVoteCounts(),
       contract.getUserVotingPower(userAddress),
-      contract.hasUserVoted(userAddress),
-      contract.getTotalVotingPower(),
+      contract.hasVoted(userAddress),
+      contract.totalVotingPower(),
     ])
 
   return {

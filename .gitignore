@@ -16,8 +16,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files
-.env*
+# env files (sensitive: DB URLs, RPC keys, ADMIN_PRIVATE_KEY)
+.env
+.env.*
+!.env.example
 
 # vercel
 .vercel
@@ -43,3 +45,17 @@ Thumbs.db
 
 # Test / coverage
 /coverage/
+
+# Backend
+backend/build
+backend/node_modules
+
+# Sensitive: keys, credentials, DB dumps
+*.pem
+*.key
+*credentials*.json
+*secrets*.json
+.pgpass
+*.sql.backup
+*.dump
+**/secrets/
