@@ -24,8 +24,8 @@ export default function Home() {
     await web3.connect()
   }
 
-  const handleDisconnectWallet = () => {
-    web3.disconnect()
+  const handleDisconnectWallet = async () => {
+    await web3.disconnect()
     setUserVote(null)
   }
 
@@ -60,6 +60,32 @@ export default function Home() {
       />
 
       <div className="max-w-4xl mx-auto px-6 py-16">
+        {voting.contractNotConfigured && (
+          <>
+            <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-amber-900 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-200">
+              <p className="font-medium">Governance contract not configured</p>
+              <p className="mt-1 text-sm">
+                The app has no on-chain voting contract yet. Deploy <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/50">StakeVotingGovernance</code> and set{' '}
+                <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/50">CONTRACT_ADDRESS</code> in{' '}
+                <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/50">lib/contract.ts</code> to enable real voting.
+              </p>
+            </div>
+            <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4 text-blue-900 dark:border-blue-800 dark:bg-blue-950/30 dark:text-blue-200">
+              <p className="font-medium">Demo mode</p>
+              <p className="mt-1 text-sm">
+                You can still click Yes or No to see how the UI behaves. Results below update with simulated vote weights. Once the smart contract is connected, results will update like this after every real transaction.
+              </p>
+            </div>
+            {voting.hasVoted && (
+              <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-amber-900 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-200">
+                <p className="font-medium">After you vote</p>
+                <p className="mt-1 text-sm">
+                  This is how results will be presented after every transaction once the smart contract is deployed. The live tally and participation percentage will update on-chain the same way.
+                </p>
+              </div>
+            )}
+          </>
+        )}
         <ProposalSection proposal={voting.proposal} />
 
         <div className="grid md:grid-cols-2 gap-8 mt-12">

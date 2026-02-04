@@ -44,12 +44,33 @@ export async function getConnectedAddress(): Promise<string | null> {
   }
 }
 
-export function setupMetaMaskListener(onAccountsChanged: (accounts: string[]) => void) {
-  if (!window.ethereum) return
+export async function revokeWalletPermissions(): Promise<void> {
+  try {
+    if (!window.ethereum?.request) return
+    await window.ethereum.request({
+      method: 'wallet_revokePermissions',
+      params: [{ eth_accounts: {} }],
+    })
+  } catch {
+    // Wallets that don't support wallet_revokePermissions will throw; ignore
+  }
+}
+
+export function setupMetaMaskListener(
+  onAccountsChanged: (accounts: string[]) => void,
+  onChainChanged?: () => void
+) {
+  if (!window.ethereum) return () => {}
 
   window.ethereum.on('accountsChanged', onAccountsChanged)
+  if (onChainChanged) {
+    window.ethereum.on('chainChanged', onChainChanged)
+  }
 
   return () => {
     window.ethereum?.removeListener('accountsChanged', onAccountsChanged)
+    if (onChainChanged) {
+      window.ethereum?.removeListener('chainChanged', onChainChanged)
+    }
   }
 }

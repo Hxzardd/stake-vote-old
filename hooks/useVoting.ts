@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { fetchVotingData, submitVote, VotingData } from '@/lib/contract'
+import { fetchVotingData, submitVote, isContractConfigured } from '@/lib/contract'
 
 interface UseVotingState {
   proposal: string
@@ -14,6 +14,7 @@ interface UseVotingState {
   isSubmitting: boolean
   error: string | null
   txHash: string | null
+  contractNotConfigured: boolean
 }
 
 export function useVoting(signer: any, address: string | null) {
@@ -28,9 +29,9 @@ export function useVoting(signer: any, address: string | null) {
     isSubmitting: false,
     error: null,
     txHash: null,
+    contractNotConfigured: false,
   })
 
-  // Fetch voting data when signer or address changes
   useEffect(() => {
     if (!signer || !address) {
       setState({
@@ -44,12 +45,26 @@ export function useVoting(signer: any, address: string | null) {
         isSubmitting: false,
         error: null,
         txHash: null,
+        contractNotConfigured: false,
       })
       return
     }
 
+    if (!isContractConfigured()) {
+      setState((prev) => ({
+        ...prev,
+        yesVotes: 0,
+        noVotes: 0,
+        totalVotingPower: 1000,
+        isLoading: false,
+        error: null,
+        contractNotConfigured: true,
+      }))
+      return
+    }
+
     const fetchData = async () => {
-      setState((prev) => ({ ...prev, isLoading: true, error: null }))
+      setState((prev) => ({ ...prev, isLoading: true, error: null, contractNotConfigured: false }))
       try {
         const data = await fetchVotingData(signer, address)
         setState((prev) => ({
@@ -61,6 +76,7 @@ export function useVoting(signer: any, address: string | null) {
           hasVoted: data.hasVoted,
           totalVotingPower: Number(data.totalVotingPower),
           isLoading: false,
+          contractNotConfigured: false,
         }))
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to fetch voting data'
@@ -84,11 +100,34 @@ export function useVoting(signer: any, address: string | null) {
       }))
       return
     }
-
     if (state.hasVoted) {
       setState((prev) => ({
         ...prev,
         error: 'You have already voted',
+      }))
+      return
+    }
+
+    const isDemo = state.contractNotConfigured || !isContractConfigured()
+
+    if (isDemo) {
+      setState((prev) => ({
+        ...prev,
+        isSubmitting: true,
+        error: null,
+        txHash: null,
+      }))
+      await new Promise((r) => setTimeout(r, 600))
+      const myWeight = Math.floor(Math.random() * 250) + 100
+      const otherWeight = Math.floor(Math.random() * 70) + 10
+      setState((prev) => ({
+        ...prev,
+        yesVotes: support ? prev.yesVotes + myWeight : prev.yesVotes + otherWeight,
+        noVotes: !support ? prev.noVotes + myWeight : prev.noVotes + otherWeight,
+        hasVoted: true,
+        isSubmitting: false,
+        txHash: '0x…demo',
+        error: null,
       }))
       return
     }
@@ -127,8 +166,12 @@ export function useVoting(signer: any, address: string | null) {
 
   const refetch = async () => {
     if (!signer || !address) return
+    if (!isContractConfigured()) {
+      setState((prev) => ({ ...prev, contractNotConfigured: true, isLoading: false }))
+      return
+    }
 
-    setState((prev) => ({ ...prev, isLoading: true, error: null }))
+    setState((prev) => ({ ...prev, isLoading: true, error: null, contractNotConfigured: false }))
     try {
       const data = await fetchVotingData(signer, address)
       setState((prev) => ({
@@ -140,6 +183,7 @@ export function useVoting(signer: any, address: string | null) {
         hasVoted: data.hasVoted,
         totalVotingPower: Number(data.totalVotingPower),
         isLoading: false,
+        contractNotConfigured: false,
       }))
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to refetch voting data'

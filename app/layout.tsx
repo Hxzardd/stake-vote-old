@@ -10,7 +10,6 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: 'StakeVote - Blockchain Corporate Voting',
   description: 'Transparent, stake-weighted corporate voting on the blockchain',
-  generator: 'v0.app',
   icons: {
     icon: [
       {
