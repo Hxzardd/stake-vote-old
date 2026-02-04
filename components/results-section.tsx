@@ -4,15 +4,18 @@ interface ResultsSectionProps {
   yesVotes: number
   noVotes: number
   yesPercentage: number
+  noPercentage: number
+  participation: number
 }
 
 export default function ResultsSection({
   yesVotes,
   noVotes,
   yesPercentage,
+  noPercentage,
+  participation,
 }: ResultsSectionProps) {
   const totalVotes = yesVotes + noVotes
-  const noPercentage = 100 - yesPercentage
 
   return (
     <Card>
@@ -59,7 +62,9 @@ export default function ResultsSection({
           </div>
           <div>
             <p className="text-xs text-muted-foreground">Participation</p>
-            <p className="text-xl font-bold text-accent">42.3%</p>
+            <p className="text-xl font-bold text-accent">
+              {participation.toFixed(1)}%
+            </p>
           </div>
         </div>
       </CardContent>

@@ -1,15 +1,23 @@
 import { BrowserProvider, Contract, ContractTransactionResponse } from 'ethers'
 
-// TODO: Replace with your actual contract address
+// TODO: Replace with your actual contract address after deployment
 export const CONTRACT_ADDRESS = '0x...'
 
-// TODO: Replace with your actual contract ABI
+/**
+ * ABI for StakeVoting contract. Matches exact function signatures required by frontend.
+ * Full ABI JSON: contracts/abi/StakeVoting.json
+ */
 export const CONTRACT_ABI = [
-  'function proposal() public view returns (string)',
-  'function voters(address) public view returns (uint256 stake, bool voted)',
-  'function yesVotes() public view returns (uint256)',
-  'function noVotes() public view returns (uint256)',
-  'function vote(bool support) public',
+  'function getProposal() view returns (string description)',
+  'function getVoteCounts() view returns (uint256 yesVotes, uint256 noVotes)',
+  'function getUserVotingPower(address voter) view returns (uint256 votingPower)',
+  'function hasUserVoted(address voter) view returns (bool)',
+  'function vote(bool support)',
+  // Recommended (optional for UI)
+  'function getProposalDeadline() view returns (uint256 blockTimestamp)',
+  'function getQuorumPercentage() view returns (uint256)',
+  'function getTotalVotingPower() view returns (uint256)',
+  'function getProposalStatus() view returns (string)',
 ]
 
 export interface VotingData {
@@ -18,6 +26,7 @@ export interface VotingData {
   noVotes: bigint
   userStake: bigint
   hasVoted: boolean
+  totalVotingPower: bigint
 }
 
 export async function getVotingContract(signer: any) {
@@ -33,19 +42,22 @@ export async function fetchVotingData(
 ): Promise<VotingData> {
   const contract = await getVotingContract(signer)
 
-  const [proposal, yesVotes, noVotes, voterInfo] = await Promise.all([
-    contract.proposal(),
-    contract.yesVotes(),
-    contract.noVotes(),
-    contract.voters(userAddress),
-  ])
+  const [proposal, [yesVotes, noVotes], userStake, hasVoted, totalVotingPower] =
+    await Promise.all([
+      contract.getProposal(),
+      contract.getVoteCounts(),
+      contract.getUserVotingPower(userAddress),
+      contract.hasUserVoted(userAddress),
+      contract.getTotalVotingPower(),
+    ])
 
   return {
     proposal,
     yesVotes,
     noVotes,
-    userStake: voterInfo.stake,
-    hasVoted: voterInfo.voted,
+    userStake,
+    hasVoted,
+    totalVotingPower,
   }
 }
 
