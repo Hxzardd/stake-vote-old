@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Header from '@/components/header'
+import { Header } from '@/components/header'
 import ProposalSection from '@/components/proposal-section'
 import VotingPanel from '@/components/voting-panel'
 import ResultsSection from '@/components/results-section'
@@ -51,11 +51,10 @@ export default function Home() {
       : 0
 
   return (
-    <div className="min-h-screen bg-gray-900 p-4 md:p-8">
-      <div className="min-h-[calc(100vh-4rem)] bg-background border-2 border-gray-500 rounded-2xl overflow-hidden">
-        <Header />
+    <main className="min-h-screen bg-background">
+      <Header />
 
-        <main className="mx-auto max-w-5xl px-6 py-8 space-y-6">
+      <div className="mx-auto max-w-5xl px-6 py-8 space-y-6">
           {voting.contractNotConfigured && (
             <>
               <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-amber-900 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-200">
@@ -118,8 +117,8 @@ export default function Home() {
               blockchain technology.
             </p>
           </footer>
-        </main>
-      </div>
-    </div>
-  )
+        </div>
+      </main>
+    )
+  }
 }
