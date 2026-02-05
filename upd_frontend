@@ -1,0 +1,131 @@
+"use client";
+
+import { useState } from "react";
+import { Header } from "@/components/header";
+import { ProposalSection } from "@/components/proposal-section";
+import { VotingPanel } from "@/components/voting-panel";
+import { ResultsSection } from "@/components/results-section";
+import { VerificationSection } from "@/components/verification-section";
+
+// Mock data for demonstration - replace with actual blockchain data
+const MOCK_PROPOSAL = {
+  id: "PROP-2026-001",
+  title: "Approval of Q1 2026 Strategic Investment Budget",
+  description:
+    "This proposal seeks stakeholder approval for the allocation of 2,500,000 tokens toward strategic investments in emerging markets and technology infrastructure. The investment will be distributed across three key areas: market expansion (40%), R&D initiatives (35%), and operational scaling (25%). Full details are available in the attached governance document.",
+};
+
+const MOCK_CONTRACT = {
+  address: "0x1234567890abcdef1234567890abcdef12345678",
+  network: "Polygon Amoy",
+  explorerUrl: "https://amoy.polygonscan.com/address/0x1234567890abcdef1234567890abcdef12345678",
+};
+
+export default function VotingDashboard() {
+  const [isConnected, setIsConnected] = useState(false);
+  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const [hasVoted, setHasVoted] = useState(false);
+  const [userVote, setUserVote] = useState<"yes" | "no" | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Mock voting results - replace with actual blockchain data
+  const [yesVotes, setYesVotes] = useState(1250000);
+  const [noVotes, setNoVotes] = useState(450000);
+  const totalStake = yesVotes + noVotes;
+
+  const handleConnect = async () => {
+    // Placeholder for MetaMask connection logic
+    // In production, use ethers.js to connect:
+    // const provider = new ethers.BrowserProvider(window.ethereum);
+    // const accounts = await provider.send("eth_requestAccounts", []);
+    // setWalletAddress(accounts[0]);
+
+    setIsLoading(true);
+    // Simulate connection delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setIsConnected(true);
+    setWalletAddress("0xAbCdEf1234567890AbCdEf1234567890AbCdEf12");
+    setIsLoading(false);
+  };
+
+  const handleDisconnect = () => {
+    setIsConnected(false);
+    setWalletAddress(null);
+    setHasVoted(false);
+    setUserVote(null);
+  };
+
+  const handleVote = async (vote: "yes" | "no") => {
+    // Placeholder for blockchain voting logic
+    // In production, call your smart contract:
+    // const contract = new ethers.Contract(address, abi, signer);
+    // await contract.vote(vote === "yes");
+
+    setIsLoading(true);
+    // Simulate transaction delay
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    // Mock updating results
+    const mockUserStake = 50000;
+    if (vote === "yes") {
+      setYesVotes((prev) => prev + mockUserStake);
+    } else {
+      setNoVotes((prev) => prev + mockUserStake);
+    }
+
+    setUserVote(vote);
+    setHasVoted(true);
+    setIsLoading(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-900 p-4 md:p-8">
+      <div className="min-h-[calc(100vh-4rem)] bg-background border-2 border-gray-500 rounded-2xl overflow-hidden">
+        <Header />
+
+        <main className="mx-auto max-w-5xl px-6 py-8 space-y-6">
+          {/* Row 1: Active Proposal - Full Width */}
+          <ProposalSection
+            title={MOCK_PROPOSAL.title}
+            description={MOCK_PROPOSAL.description}
+            proposalId={MOCK_PROPOSAL.id}
+          />
+
+          {/* Row 2: Cast Your Vote and Current Results - Side by Side */}
+          <div className="grid gap-6 lg:grid-cols-2">
+            <VotingPanel
+              isConnected={isConnected}
+              walletAddress={walletAddress}
+              hasVoted={hasVoted}
+              userVote={userVote}
+              onVote={handleVote}
+              onConnect={handleConnect}
+              onDisconnect={handleDisconnect}
+              isLoading={isLoading}
+            />
+            <ResultsSection
+              yesVotes={yesVotes}
+              noVotes={noVotes}
+              totalStake={totalStake}
+            />
+          </div>
+
+          {/* Row 3: On-Chain Verification - Full Width */}
+          <VerificationSection
+            contractAddress={MOCK_CONTRACT.address}
+            networkName={MOCK_CONTRACT.network}
+            explorerUrl={MOCK_CONTRACT.explorerUrl}
+          />
+
+          {/* Footer note */}
+          <footer className="mt-12 border-t border-border pt-6 text-center">
+            <p className="text-sm text-white/70">
+              StakeVote is a transparent corporate governance solution built on
+              blockchain technology.
+            </p>
+          </footer>
+        </main>
+      </div>
+    </div>
+  );
+}
