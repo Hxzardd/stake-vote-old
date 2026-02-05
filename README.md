@@ -53,6 +53,12 @@ StakeVote is designed to mirror real-world corporate governance rather than toke
 - **Implement smart contract in codebase:** The smart contract currently runs only experimentally (e.g. tested in Remix). Implement full build, deploy, and integration in this repo (e.g. Foundry/Hardhat scripts, CI, and wiring to frontend/backend).
 - **Off-chain DB ↔ on-chain wallets:** The backend includes a PostgreSQL schema (`backend/schema/001_initial.sql`) that maps **user-holdings off-chain** (identity, KYC, live equity in `users`, `wallets`, `holdings`) to **user-wallets on-chain**. A snapshot job freezes stake at a cutoff time into `stake_snapshots` (proposal, wallet address, stake amount); the backend then calls the contract’s `assignStake(wallet, stake)` so voting power on-chain reflects the off-chain snapshot. Integrate and run the snapshot + proposal lifecycle when ready to go live.
 
+## Contributors
+
+- [Vani](https://github.com/VaniNaja)
+- [Pranav](https://github.com/pranavdiddiisawesome)
+- [Darsheel](https://github.com/Hxzardd)
+
 ## License
 
 MIT.
