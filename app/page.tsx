@@ -51,65 +51,75 @@ export default function Home() {
       : 0
 
   return (
-    <main className="min-h-screen bg-background">
-      <Header
-        isConnected={web3.isConnected}
-        walletAddress={formatAddress(web3.address)}
-        onConnect={handleConnectWallet}
-        onDisconnect={handleDisconnectWallet}
-      />
+    <div className="min-h-screen bg-gray-900 p-4 md:p-8">
+      <div className="min-h-[calc(100vh-4rem)] bg-background border-2 border-gray-500 rounded-2xl overflow-hidden">
+        <Header />
 
-      <div className="max-w-4xl mx-auto px-6 py-16">
-        {voting.contractNotConfigured && (
-          <>
-            <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-amber-900 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-200">
-              <p className="font-medium">Governance contract not configured</p>
-              <p className="mt-1 text-sm">
-                The app has no on-chain voting contract yet. Deploy <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/50">StakeVotingGovernance</code> and set{' '}
-                <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/50">CONTRACT_ADDRESS</code> in{' '}
-                <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/50">lib/contract.ts</code> to enable real voting.
-              </p>
-            </div>
-            <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4 text-blue-900 dark:border-blue-800 dark:bg-blue-950/30 dark:text-blue-200">
-              <p className="font-medium">Demo mode</p>
-              <p className="mt-1 text-sm">
-                You can still click Yes or No to see how the UI behaves. Results below update with simulated vote weights. Once the smart contract is connected, results will update like this after every real transaction.
-              </p>
-            </div>
-            {voting.hasVoted && (
+        <main className="mx-auto max-w-5xl px-6 py-8 space-y-6">
+          {voting.contractNotConfigured && (
+            <>
               <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-amber-900 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-200">
-                <p className="font-medium">After you vote</p>
+                <p className="font-medium">Governance contract not configured</p>
                 <p className="mt-1 text-sm">
-                  This is how results will be presented after every transaction once the smart contract is deployed. The live tally and participation percentage will update on-chain the same way.
+                  The app has no on-chain voting contract yet. Deploy <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/50">StakeVotingGovernance</code> and set{' '}
+                  <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/50">CONTRACT_ADDRESS</code> in{' '}
+                  <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/50">lib/contract.ts</code> to enable real voting.
                 </p>
               </div>
-            )}
-          </>
-        )}
-        <ProposalSection proposal={voting.proposal} />
+              <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4 text-blue-900 dark:border-blue-800 dark:bg-blue-950/30 dark:text-blue-200">
+                <p className="font-medium">Demo mode</p>
+                <p className="mt-1 text-sm">
+                  You can still click Yes or No to see how the UI behaves. Results below update with simulated vote weights. Once the smart contract is connected, results will update like this after every real transaction.
+                </p>
+              </div>
+              {voting.hasVoted && (
+                <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-amber-900 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-200">
+                  <p className="font-medium">After you vote</p>
+                  <p className="mt-1 text-sm">
+                    This is how results will be presented after every transaction once the smart contract is deployed. The live tally and participation percentage will update on-chain the same way.
+                  </p>
+                </div>
+              )}
+            </>
+          )}
 
-        <div className="grid md:grid-cols-2 gap-8 mt-12">
-          <VotingPanel
-            isConnected={web3.isConnected}
-            hasVoted={voting.hasVoted}
-            userVote={userVote}
-            userStake={voting.userStake}
-            onVote={handleVote}
-            isLoading={voting.isSubmitting}
-            error={voting.error || web3.error}
-          />
+          <ProposalSection proposal={voting.proposal} />
 
-          <ResultsSection
-            yesVotes={voting.yesVotes}
-            noVotes={voting.noVotes}
-            yesPercentage={yesPercentage}
-            noPercentage={noPercentage}
-            participation={participation}
-          />
-        </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            <VotingPanel
+              isConnected={web3.isConnected}
+              walletAddress={formatAddress(web3.address)}
+              hasVoted={voting.hasVoted}
+              userVote={userVote}
+              userStake={voting.userStake}
+              onVote={handleVote}
+              onConnect={handleConnectWallet}
+              onDisconnect={handleDisconnectWallet}
+              isLoading={voting.isSubmitting}
+              error={voting.error || web3.error}
+            />
 
-        <VerificationSection />
+            <ResultsSection
+              yesVotes={voting.yesVotes}
+              noVotes={voting.noVotes}
+              totalStake={voting.totalVotingPower}
+              yesPercentage={yesPercentage}
+              noPercentage={noPercentage}
+              participation={participation}
+            />
+          </div>
+
+          <VerificationSection />
+
+          {/* Footer note */}
+          <footer className="mt-12 border-t border-border pt-6 text-center">
+            <p className="text-sm text-white/70">
+              StakeVote is a transparent corporate governance solution built on
+              blockchain technology.
+            </p>
+          </footer>
+        </main>
       </div>
-    </main>
+    </div>
   )
 }
