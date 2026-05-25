@@ -55,7 +55,7 @@ StakeVote is designed to mirror real-world corporate governance rather than toke
 
 ## Contributors
 
-- [Vani](https://github.com/VaniNaja)
+- [Vani](https://github.com/vani-naja08)
 - [Pranav](https://github.com/pranavdiddiisawesome)
 - [Darsheel](https://github.com/Hxzardd)
 
